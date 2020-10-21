@@ -2,6 +2,7 @@
 Aqui será abordado de forma teorica sem o intuito de demonstrar um tutorial sobre o projeto em questão em que desenvolvi.
 #
 
+![In_Build](Imagens/in_building.png)
 
 ### Aplicacãoes utilizadas e suas respectivas funcionalidades e funçoes dentro do projeto:
 
