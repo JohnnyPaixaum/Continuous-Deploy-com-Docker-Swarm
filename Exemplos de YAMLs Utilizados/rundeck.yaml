@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+
+   rundeck:
+      image: "johnnysilva110/rundeck-docker:1.3"
+      volumes:
+         - "rundeck_data:/home/rundeck/server/data"
+         - "rundeck_cert:/root/.ssh"
+         - "/mnt/gluster_docker/volumes/rundeck_config/_data/realm.properties:/home/rundeck/server/config/realm.properties"
+         - "/var/run/docker.sock:/var/run/docker.sock"
+      networks:
+         - net-proxy
+      environment:
+         - RUNDECK_GRAILS_URL=https://rundeck.labary.local 
+      deploy:
+         mode: replicated
+         replicas: 1
+         #resources:
+         #  limits:
+         #    #cpus: '3.90'
+         #    memory: 400MB
+         #  reservations:
+         #    #cpus: '2.50'
+         #    memory: 250MB
+         restart_policy:
+            condition: on-failure
+         labels:
+            - "traefik.frontend.rule=Host:rundeck.labary.local"
+            - "traefik.port=4440"
+            - "traefik.docker.network=net-proxy"
+            - "traefik.frontend.entryPoints=https"
+            - "traefik.backend.loadbalancer.stickiness=true"
+            - "traefik.backend.loadbalancer.method=drr"
+            - "traefik.backend.loadbalancer.swarm=true"
+            - "traefik.enable=true"
+
+networks:
+   net-proxy:
+      driver: overlay
+      external: true
+
+volumes:
+   rundeck_data:
+      driver_opts:
+         type: "none"
+         o: "bind"
+         device: "/mnt/gluster_docker/volumes/rundeck_date/_date"
+   rundeck_cert:
+      driver_opts:
+         type: "none"
+         o: "bind"
+         device: "/mnt/gluster_docker/volumes/rundeck_cert/_date"
