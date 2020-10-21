@@ -1,9 +1,9 @@
 # Continuous Deploy com Docker Swarm
-    ### Aqui será abordado de forma teorica sem o intuito de demonstrar um tutorial sobre o projeto em questão em que desenvolvi.
+Aqui será abordado de forma teorica sem o intuito de demonstrar um tutorial sobre o projeto em questão em que desenvolvi.
 #
 
 
-## Aplicacãoes utilizadas e suas respectivas funcionalidades e funçoes dentro do projeto:
+### Aplicacãoes utilizadas e suas respectivas funcionalidades e funçoes dentro do projeto:
 
 * **Docker Swarm**: Conjunto de servidores para funcionamento de um Cluster Docker Swarm que consiste em 3 servidores onde é possível garantir LoadBalance e Alta Disponibilidade entre os serviços em funcionamento nele. Por exemplo:  Vamos teorizar que uma aplicação web estivesse em Docker Swarm, então criaremos um serviço dessa aplicação que consistiria em configurar e adaptar ela ao Docker, com o serviço criado escalaremos ele para 6, logo haverá 6 containers idênticos com a aplicação web espalhados uniformemente entre os 3 nós do Swarm, sendo assim, caso o nó 03 caia, ainda haveria os nós 01 e 02 disponíveis com a aplicação web que não seria afetada pela queda do nó 03 garantindo assim a disponibilidade da aplicação web, além de promover um LoadBalance que consistiria em distribuir as requisições entre os containers do serviço contido nos nós evitando então uma carga elevada em apenas um ponto. E para se ter uma estrutura automatizada há um conjunto de aplicações que será explicadas a baixo.
 
@@ -17,3 +17,4 @@ A figura a seguir mostra a arquitetura do projeto:
     ![Arquitetura Kubernetes](Imagens/Docker_Estrutura.PNG) 
 
 ### **Workflow:**  
+Tudo começaria com um _Push_ efetuado por um Develop a um projeto no _Gitlab_ no qual o _Rundeck_ esteja configurado, em seguida o _Gitlab_ enviará um _Webhook_ para um projeto no _Rundeck_ conrrespondente ao projeto em questão e iniciará as tarefas necessarias para que tal projeto "suba" de forma automatizada no Cluster de Docker Swarm, e conforme as informações passadas nas configurações de como o projeto deve "subir" no docker(como em um arquivo .yaml ou via CLI) o _Traefik_ irá criar um _Hostname_ para o acesso ao _Service_ relacionado ao projeto em questão. Em caso de um _Service_ de um projeto já existente o _Rundeck_ iria apenas criar uma nova _Image_ de Docker e atualizaria os containers conrrespondente ao _Service_ do projeto.
