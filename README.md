@@ -1,5 +1,6 @@
 # Continuous Deploy com Docker Swarm
-Aqui será abordado de forma teorica sem o intuito de demonstrar um tutorial sobre o projeto em questão em que desenvolvi.
+Aqui será abordado de forma teorica sem o intuito de ser um tutorial sobre o projeto em questão em que desenvolvi com o objetivo de demonstrar habilidades e conhecimento relacionados a Docker, CI/CD, Automação, Shell_Script, Clasterização, Arquivos YAML's, Storage e Sistemas GNU/Linux.
+Posteriormente ao fim desse "artigo" estarei implementando o _Nexus Repository_ para versionamento de _Imagens_ Docker e futuramente recriando essa mesma estrutura com base no _Kubernetes_, HA Proxy, _Jenkins_ como Dashboard de _Deployments_ e aplicões de monitoramento(EX: Prometheus, Grafana...).
 #
 
 ![In_Build](Imagens/in_building.png)
