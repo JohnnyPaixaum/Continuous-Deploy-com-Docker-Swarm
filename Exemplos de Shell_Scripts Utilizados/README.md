@@ -1,4 +1,5 @@
 ![In_Build](../Imagens/in_building.png)
+
 Os arquivos .sh foram pensados para serem os mais universais possiveis, possuindo parametros que são alimentados via _Variaveis de Ambiente_ passandos nas configurações do _job_ no projeto do _Rundeck_, variaveis essas que possuem seu inicio com 'RD_OPTION' e são necessarias para o funcionamento do _Shell Script_.
 
 A baixo a função de cada variavel de ambiente:  

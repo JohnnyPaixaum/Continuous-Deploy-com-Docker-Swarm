@@ -3,30 +3,29 @@ version: "3.8"
 services:
 
    rundeck:
-      image: "johnnysilva110/rundeck-docker:1.3"
+      image: "johnnysilva110/rundeck-docker:1.3" #Image feita por min em cima da Image oficial do Rundeck.
       volumes:
-         - "rundeck_data:/home/rundeck/server/data"
-         - "rundeck_cert:/root/.ssh"
-         - "/mnt/gluster_docker/volumes/rundeck_config/_data/realm.properties:/home/rundeck/server/config/realm.properties"
-         - "/var/run/docker.sock:/var/run/docker.sock"
+         - "rundeck_data:/home/rundeck/server/data" #VOLUME DE PERSISTIR DE DADOS PRINCIPAIS DO RUNDECK.
+         - "rundeck_cert:/root/.ssh" #VOLUME PARA PERSISTIR KEYS SSH USADAS PELO RUNDECK.
+         - "${realm.properties-PATH}:/home/rundeck/server/config/realm.properties" #ARQUIVO DE CREDENCIAIS DE ACESSO PARA O RUNDECK.(https://docs.rundeck.com/docs/administration/security/authentication.html#propertyfileloginmodule)
+         - "/var/run/docker.sock:/var/run/docker.sock" #CAMINHO DO SOCK DO DOCKER.
       networks:
-         - net-proxy
+         - net-proxy #É IMPORTANTE QUE A NETWORK DO SERVICE SEJA A MESMA NA QUAL O TRAEFIK ESTÁ.
       environment:
-         - RUNDECK_GRAILS_URL=https://rundeck.labary.local 
+         - RUNDECK_GRAILS_URL=https://rundeck.${DOMAIN.LOCAL} #URL NO QUAL O  RUNDECK IRÁ TI REDIRECIONAR AO LOGAR-SE. IMPORTANTE SETAR ESSE VALOR CASO CONTRARIO ELE IRA TI MANDAR PARA O ENDEREÇO DO CONTAINER OU PARA O 127.0.0.1.
       deploy:
          mode: replicated
          replicas: 1
-         #resources:
-         #  limits:
-         #    #cpus: '3.90'
-         #    memory: 400MB
-         #  reservations:
-         #    #cpus: '2.50'
-         #    memory: 250MB
+         placement:
+            constraints:
+               - node.role == manager #FLAG PARA QUE O RUNDECK SUBA APENAS EM NÓS MASTERS. 
          restart_policy:
             condition: on-failure
-         labels:
-            - "traefik.frontend.rule=Host:rundeck.labary.local"
+         update_config:
+            parallelism: 1
+            delay: 10s
+         labels: #LEBELS NECESSARIOS PARA A UTILIZAÇÃO DO TRAEFIK (https://doc.traefik.io/traefik/v1.7/configuration/backends/docker/)
+            - "traefik.frontend.rule=Host:rundeck.${DOMAIN.LOCAL}"
             - "traefik.port=4440"
             - "traefik.docker.network=net-proxy"
             - "traefik.frontend.entryPoints=https"
@@ -38,16 +37,17 @@ services:
 networks:
    net-proxy:
       driver: overlay
-      external: true
+      external: true 
 
+#OS VOLUMES AQUI CONFIGURADOS FAZEM UM BIND ATÉ O LOCAL GERENCIADO PELO GLUSTERFS.
 volumes:
    rundeck_data:
       driver_opts:
          type: "none"
          o: "bind"
-         device: "/mnt/gluster_docker/volumes/rundeck_date/_date"
+         device: "${GLUSTER-PATH01}"
    rundeck_cert:
       driver_opts:
          type: "none"
          o: "bind"
-         device: "/mnt/gluster_docker/volumes/rundeck_cert/_date"
+         device: "${GLUSTER-PATH02}"

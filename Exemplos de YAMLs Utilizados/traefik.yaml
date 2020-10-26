@@ -1,13 +1,16 @@
-version: "3.7"
+version: "3.8"
 
 services:
 
    reverse_proxy:
-      image: traefik:1.7
-      command: --api --docker --docker.swarmMode --docker.domain=labary.local --docker.watch --logLevel=DEBUG
+      image: traefik:v1.7.24-alpine
+      command: --api --docker --docker.swarmMode --docker.domain=${DOMAIN.LOCAL} --docker.watch --logLevel=DEBUG 
       networks:
-         - principal
-      ports:
+         - net-proxy
+      dns:
+         - ${DNS_IP}
+      dns_search: ${FQDN.DOMAIN.LOCAL}
+      ports: #PORTAS NO QUAL O TRAEFIK FICARÁ OUVINDO PARA GERENCIAS OS REQUESTS PARA OS SEUS RESPECTIVOS CONTAINERS.
          - target: 80
          published: 80
          protocol: tcp
@@ -21,14 +24,27 @@ services:
          protocol: tcp
          mode: host
       volumes:
-         - "/var/run/docker.sock:/var/run/docker.sock" 
+         - "/var/run/docker.sock:/var/run/docker.sock" #CAMINHO DO SOCK DO DOCKER.
+         - "/etc/localtime:/etc/localtime:ro"
+         - "traefik_certs:/certs"
+         - "/mnt/gluster_docker/volumes/traefik_config/_data/traefik.toml:/etc/traefik/traefik.toml"
       deploy:
          mode: global
          placement:
             constraints:
-               - node.role == manager
+               - node.role == manager #FLAG PARA QUE O TRAEFIK SUBA APENAS EM NÓS MASTERS.
+         update_config:
+            parallelism: 1
+            delay: 10s
 
-networks:
-   principal:
+networks: 
+   net-proxy:
       external: true
       driver: overlay
+
+volumes:
+   traefik_certs:
+      driver_opts:
+         type: "none"
+         o: "bind"
+         device: "/mnt/gluster_docker/volumes/traefik_certs/_data"
